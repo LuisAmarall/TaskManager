@@ -1,6 +1,6 @@
 ﻿namespace TaskManager.Domain.Model;
 
-public class Task
+public class Tasks
 {
     public enum TaskStatus
     {
@@ -9,9 +9,9 @@ public class Task
         Done
     }
 
-    private Task() { }
+    private Tasks() { }
 
-    public Task(string title, string description)
+    public Tasks(string title, string description)
     {
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Title is required", nameof(title));
@@ -38,6 +38,9 @@ public class Task
     public DateTime? InProcess { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
+    public DateTime? DeleteAt { get; private set; }
+    public bool IsDeleted() => DeleteAt != null;
+
     public void UpdateTitle(string title)
     {
         if (title is null)
@@ -63,7 +66,7 @@ public class Task
     public void Start()
     {
         if (Status != TaskStatus.ToDo)
-            throw new InvalidOperationException("Task must be ToDo to start");
+            throw new InvalidOperationException("Tasks must be ToDo to start");
 
         Status = TaskStatus.Doing;
         InProcess = DateTime.UtcNow;
@@ -72,9 +75,25 @@ public class Task
     public void Complete()
     {
         if (Status != TaskStatus.Doing)
-            throw new InvalidOperationException("Task must be Doing to complete");
+            throw new InvalidOperationException("Tasks must be Doing to complete");
 
         Status = TaskStatus.Done;
         CompletedAt = DateTime.UtcNow;
+    }
+
+    public void Delete()
+    {
+        if (Status == TaskStatus.Done && DeleteAt != null)
+            return;
+
+        DeleteAt = DateTime.UtcNow;
+    }
+
+    public void Restore()
+    {
+        if (DeleteAt == null)
+            return;
+
+        DeleteAt = null;
     }
 }
