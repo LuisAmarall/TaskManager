@@ -1,17 +1,20 @@
 ﻿using TaskManager.Application.Contracts.Requests;
+using TaskManager.Application.Contracts.Responses;
 using TaskManager.Domain.Model;
 
 namespace TaskManager.Application.Interfaces.Services;
 
 public interface ITasksServices
 {
-    Task <Tasks> AddAsync(CreateTasksRequest request);
+    Task <TasksResponses> CreateAsync(CreateTasksRequest request);
 
-    Task <Tasks> GetByIdAsync(Guid id);
+    Task <TasksResponses> GetByIdAsync(Guid id);
 
-    Task <IReadOnlyList<Task>> GetAllAsync();
+    Task <TasksResponses> GetByTitleAsync(string title);
 
-    Task <Tasks> UpdateAsync(Guid id, UpdateTasksRequest request);
+    Task<IReadOnlyList<TasksResponses>> GetAllAsync();
+
+    Task <TasksResponses> UpdateAsync(Guid id, CreateTasksRequest request);
 
     Task <bool> DeleteAsync(Guid id);
 }

@@ -6,11 +6,15 @@ public interface ITasksRepository
 {
     Task AddAsync(Tasks tasks);
 
-    Task <Tasks?> GetById(Guid id);
+    Task <Tasks?> GetByIdAsync(Guid id);
 
-    Task <Task> GetByTitle(string title);
+    Task <Tasks> GetByTitleAsync(string title);
 
-    Task UpdateAsync(Tasks tasks);
+    Task<IReadOnlyList<Tasks>> GetAllAsync();
+
+    Task UpdateAsync(Guid id, Tasks tasks);
 
     Task DeleteAsync(Tasks tasks);
+
+    Task SaveChangesAsync();
 }

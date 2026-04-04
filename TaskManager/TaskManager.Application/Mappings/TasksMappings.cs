@@ -11,9 +11,9 @@ public static class TasksMappings
         return new Tasks(request.Title, request.Description);
     }
 
-    public static CreateTasksResponses ToResponse(this Tasks tasks)
+    public static TasksResponses ToResponse(this Tasks tasks)
     {
-        return new CreateTasksResponses
+        return new TasksResponses
          (
              tasks.Id,
              tasks.Title,
