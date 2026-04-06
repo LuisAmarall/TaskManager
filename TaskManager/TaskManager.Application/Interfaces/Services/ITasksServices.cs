@@ -1,5 +1,7 @@
 ﻿using TaskManager.Application.Contracts.Requests;
 using TaskManager.Application.Contracts.Responses;
+using TaskManager.Application.Interfaces.Repositories;
+using TaskManager.Domain.Exception;
 using TaskManager.Domain.Model;
 
 namespace TaskManager.Application.Interfaces.Services;
@@ -16,5 +18,7 @@ public interface ITasksServices
 
     Task <TasksResponses> UpdateAsync(Guid id, CreateTasksRequest request);
 
-    Task <bool> DeleteAsync(Guid id);
+    Task DeleteAsync(Guid id);
+
+    Task RestoreAsync(Guid id);
 }
