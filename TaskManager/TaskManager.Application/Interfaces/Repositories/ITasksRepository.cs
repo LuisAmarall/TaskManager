@@ -12,7 +12,7 @@ public interface ITasksRepository
 
     Task<IReadOnlyList<Tasks>> GetAllAsync();
 
-    Task UpdateAsync(Guid id, Tasks tasks);
+    Task UpdateAsync(Tasks tasks);
 
     Task DeleteAsync(Tasks tasks);
 

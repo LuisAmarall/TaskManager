@@ -1,42 +1,53 @@
-﻿using TaskManager.Application.Interfaces.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Application.Interfaces.Repositories;
 using TaskManager.Domain.Model;
+using TaskManager.Infrastructure.Persistence.DbContexts;
 
 namespace TaskManager.Infrastructure.Repositories;
 
 public class TasksRepository : ITasksRepository
 {
-    public Task AddAsync(Tasks tasks)
+    public TasksRepository(TasksContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteAsync(Tasks tasks)
+    private readonly TasksContext _context;
+
+    public async Task AddAsync(Tasks tasks)
     {
-        throw new NotImplementedException();
+        await _context.Tasks.AddAsync(tasks);
+        await _context.SaveChangesAsync();
     }
 
-    public Task<IReadOnlyList<Tasks>> GetAllAsync()
+    public async Task<Tasks?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(i  => i.Id == id);
     }
 
-    public Task<Tasks?> GetByIdAsync(Guid id)
+    public async Task<Tasks> GetByTitleAsync(string title)
     {
-        throw new NotImplementedException();
+        return await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(t =>  t.Title == title);
     }
 
-    public Task<Tasks> GetByTitleAsync(string title)
+    public async Task<IReadOnlyList<Tasks>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Tasks.AsNoTracking().ToListAsync();
     }
 
-    public Task SaveChangesAsync()
+    public async Task UpdateAsync(Tasks tasks)
     {
-        throw new NotImplementedException();
+        var newValue = await _context.Tasks.Where(i => i.Id ==  tasks.Id).FirstOrDefaultAsync();
+
+        _context.Entry(newValue).CurrentValues.SetValues(tasks);
+        _context.Update<Tasks>(tasks);
+
+        await _context.SaveChangesAsync();
     }
 
-    public Task UpdateAsync(Guid id, Tasks tasks)
+    public async Task DeleteAsync(Tasks tasks)
     {
-        throw new NotImplementedException();
+        tasks.Delete();
+        await UpdateAsync(tasks);
     }
 }

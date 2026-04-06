@@ -1,4 +1,5 @@
-﻿using TaskManager.Application.Mappings;
+﻿using TaskManager.Domain.Exception;
+using TaskManager.Application.Mappings;
 using TaskManager.Application.Validations;
 using TaskManager.Application.Contracts.Requests;
 using TaskManager.Application.Interfaces.Services;
@@ -31,20 +32,14 @@ public sealed class TasksServices : ITasksServices
 
     public async Task<TasksResponses> GetByIdAsync(Guid id)
     {
-        var read = await _tasksRepository.GetByIdAsync(id);
-
-        if (read is null)
-            throw new InvalidOperationException($"Task with id {id} not found");
+        var read = await _tasksRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Task with id {id} not found");
 
         return TasksMappings.ToResponse(read);
     }
 
     public async Task<TasksResponses> GetByTitleAsync(string title)
     {
-        var read = await _tasksRepository.GetByTitleAsync(title);
-
-        if (read is null)
-            throw new InvalidOperationException($"Task with title {title} not found");
+        var read = await _tasksRepository.GetByTitleAsync(title) ?? throw new NotFoundException($"Task with title {title} not found");
 
         return TasksMappings.ToResponse(read);
     }
@@ -53,17 +48,12 @@ public sealed class TasksServices : ITasksServices
     {
         var tasks = await _tasksRepository.GetAllAsync();
 
-        var response = new List<TasksResponses>();
-
         return tasks.Select(t => t.ToResponse()).ToList().AsReadOnly();
     }
 
     public async Task<TasksResponses> UpdateAsync(Guid id, CreateTasksRequest request)
     {
-        var entity = await _tasksRepository.GetByIdAsync(id);
-
-        if (entity is null)
-            throw new InvalidOperationException($"Task with id {id} not found");
+        var entity = await _tasksRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Task with id {id} not found");
 
         TasksValidations.IsValid(request);
 
@@ -75,17 +65,21 @@ public sealed class TasksServices : ITasksServices
         return TasksMappings.ToResponse(entity);
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
-        var entity = await _tasksRepository.GetByIdAsync(id);
+        var tasks = await _tasksRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Task with id {id} not found");
 
-        if (entity is null)
-            return false;
+        tasks.Delete();
 
-
-        entity.Delete();
         await _tasksRepository.SaveChangesAsync();
+    }
 
-        return true;
+    public async Task RestoreAsync(Guid id)
+    {
+        var tasks = await _tasksRepository.GetByIdAsync(id) ?? throw new NotFoundException($"Task with id {id} not found");
+
+        tasks.Restore();
+
+        await _tasksRepository.SaveChangesAsync();
     }
 }
