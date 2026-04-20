@@ -12,5 +12,10 @@ public class TasksContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TasksContext).Assembly);
+
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Tasks>()
+            .HasQueryFilter(t => t.DeletedAt == null);
     }
 }
