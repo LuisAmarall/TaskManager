@@ -38,8 +38,8 @@ public class Tasks
     public DateTime? InProcess { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
-    public DateTime? DeleteAt { get; private set; }
-    public bool IsDeleted() => DeleteAt != null;
+    public DateTime? DeletedAt { get; private set; }
+    public bool IsDeleted() => DeletedAt != null;
 
     public void UpdateTitle(string title)
     {
@@ -83,17 +83,17 @@ public class Tasks
 
     public void Delete()
     {
-        if (Status == TaskStatus.Done && DeleteAt != null)
+        if (Status == TaskStatus.Done && DeletedAt != null)
             return;
 
-        DeleteAt = DateTime.UtcNow;
+        DeletedAt = DateTime.UtcNow;
     }
 
     public void Restore()
     {
-        if (DeleteAt == null)
+        if (DeletedAt == null)
             return;
 
-        DeleteAt = null;
+        DeletedAt = null;
     }
 }
